@@ -1,26 +1,18 @@
-import React from 'react';
+import { observer } from 'mobx-react-lite';
 import { Grid } from 'semantic-ui-react';
-import { Activity } from '../../../app/models/activity';
+import { useStore } from '../../../app/stores/store';
 import ActivityDetails from '../details/ActivityDetails';
 import ActivityForm from '../form/ActivityForm';
 import ActivityList from './ActivityList';
 
-interface Props {
-    activities: Activity[];
-    selectedActivity: Activity | undefined;
-    selectActivity: (id: String) => void;
-    cancelSelectActivity: () => void;
-    editMode: boolean;
-    openForm: (id: String) => void;  //一樣要增加返回無效void
-    closeForm: () => void; //不須任何參數返回無效=void
-    createOrEdit: (activity: Activity) => void;
-    deleteActivity: (id: string) => void;
-    submitting: boolean;
-}
 
 
-export default function ActivityDashboard({activities, selectedActivity, selectActivity ,
-    cancelSelectActivity, editMode, openForm, closeForm, createOrEdit, deleteActivity, submitting}: Props) {
+export default observer( function ActivityDashboard() {
+
+    const {activityStore}=useStore();
+
+    const {selectedActivity,editMode}=activityStore;
+
     return (
         <Grid>
             <Grid.Column width='10'>
@@ -33,30 +25,16 @@ export default function ActivityDashboard({activities, selectedActivity, selectA
 
                     )}
                 </List> */}
-                <ActivityList 
-                    activities={activities} 
-                    selectActivity={selectActivity}
-                    deleteActivity={deleteActivity}
-                    submitting={submitting}
-                />
+                <ActivityList />
             </Grid.Column>
             <Grid.Column width='6'>
                 {selectedActivity && !editMode &&
-                <ActivityDetails 
-                    activity={selectedActivity} 
-                    cancelSelectActivity={cancelSelectActivity}
-                    openForm={openForm} 
-                />}
+                <ActivityDetails />}
                 {/* 當編輯模式才出現closeForm功能 並傳遞至activity=所選活動*/}
                 {editMode &&
-                <ActivityForm 
-                    closeForm={closeForm} 
-                    activity={selectedActivity} 
-                    createOrEdit={createOrEdit}
-                    submitting={submitting}
-                />} 
+                <ActivityForm />} 
 
             </Grid.Column>
         </Grid>
     )
-}
+})
