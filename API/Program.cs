@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using MediatR;
+using Application.Activities;
+using Application.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,20 @@ builder.Services.AddDbContext<DataContext>(opt =>{
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+//解決React APP訪問API CORS Policy問題增加CorsPolicy
+builder.Services.AddCors(opt => {
+    opt.AddPolicy("CorsPolicy", policy =>{
+        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+    });
+});
+
+//增加Mediator框架是Activity的List物件
+builder.Services.AddMediatR(typeof(List.Handler));
+
+//增加AutoMapper框架自動對應物件屬性
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,6 +38,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//在中介層引用CorsPolicy
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
